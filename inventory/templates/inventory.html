@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %} Inventory List {% endblock title %}
+{% block content %}
+<main class="main-wrapper ms-sm-auto py-4 px-md-4 border-start">
+    <div class="row my-4">
+        <div class="col-lg-12 col-12">
+            <div class="custom-block bg-white">
+                <h5 class="mb-4">Inventory List</h5>
+                <div class="table-responsive">
+                    {% render_field filter.form.name class="input" placeholder="Search by Stock" %}
+                    <table class="account-table table">
+                        <thead class="thead-inverse align-middle">
+                        <br/>
+                        <tr>
+                            <th width="15%">Name</th>
+                            <th width="20%">Description</th>
+                            <th width="10%">Quantity</th>
+                            <th width="10%">Type</th>
+                            <th width="15%">Material</th>
+                            <th width="10%">Packing</th>
+                            <th width="10%">Lot Size</th>
+                            <th width="10%">File</th>
+                        </tr>
+                        </thead>
+                        {% if object_list %}
+                        <tbody>
+                        {% for stock in object_list %}
+                        <tr>
+                            <td>
+                                <h6><a href="{% url 'inventory'%}">{{ stock.name }}</a> </h6>
+                            </td>
+                            <td class="align-middle"> {{ stock.desc }} </td>
+                            <td class="align-middle" > {{ stock.quantity }} </td>
+                            <td class="align-middle" > {{ stock.type }} </td>
+                            <td class="align-middle" > {{ stock.materials }} </td>
+                            <td class="align-middle "> {{ stock.packing }} </td>
+                            <td class="align-middle "> {{ stock.lotsize }} </td>
+                            <td class="align-middle "> {{ stock.file }} </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="align-middle">
+        {% if is_paginated %}
+        {% if page_obj.has_previous %}
+        <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
+        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+        {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+        <a class="btn btn-info mb-4" href="?page={{ num }}">{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+        <a class="btn btn-outline-info mb-4" href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}
+        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number }}">Next</a>
+        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+        {% endif %}
+        {% endif %}
+    </div>
+    {% else %}
+    <tbody></tbody>
+    </table>
+    <br><br><br><br><br><br><br><br>
+    <div style="color: #ea2088; font-style: bold; font-size: 1.5rem; text-align: center;">WOW, SUCH EMPTY</div>
+    {% endif %}
+</main>
+{% endblock content %}

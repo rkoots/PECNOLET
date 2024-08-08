@@ -64,8 +64,6 @@ To create an admin user for accessing the Django admin interface, run:
 
 ```bash
 python manage.py createsuperuser
-python manage.py create_superuser --username a --password a
-
 ```
 
 Follow the prompts to set the username, email, and password.

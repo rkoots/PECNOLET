@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %} Dashboard {% endblock %}
+{% block content %}
+<main class="main-wrapper ms-sm-auto border-start">
+    <div class="title-group mb-3">
+        <h1 class="h2 mb-0">Overview</h1>
+        <small class="text-muted">Hello {{ request.user.first_name }}, welcome back!</small>
+    </div>
+
+    <div class="row my-4">
+        <div class="col-lg-7 col-12">
+            <!-- Balance Block -->
+            <div class="custom-block custom-block-balance">
+                <small>Total Stock</small>
+                <h2 class="mt-2 mb-3">{%if total_stock %}{{total_stock}}{% else %}0{% endif %}</h2>
+                <div class="d-flex">
+                    <div>
+                        <small>Account Valid Date</small>
+                        <p>12/2028</p>
+                    </div>
+                    <div class="ms-auto">
+                        <small>Account Type</small><br/>
+                        <span>{% if request.user.is_staff %}Supplier/Manufacturer{% else %}Customer/Buyer{% endif %}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="custom-block bg-white">
+                <h5 class="mb-4">Recent In Stock</h5>
+                <ul class="list-group">
+                    {% for recent_stock in recent_stocks %}
+                    <li class="list-group-item">
+                        Stock ID: {{ recent_stock.id }} - {{ recent_stock.name }} on {{ recent_stock.created_at }} of {{ recent_stock.quantity }} qty.
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">No New Stocks.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="custom-block bg-white">
+                <h5 class="mb-4">Recent Out Stock</h5>
+                <ul class="list-group">
+                    {% for recent_stock in recent_out_stocks %}
+                    <li class="list-group-item">
+                        Stock ID: {{ recent_stock.id }} of {{ recent_stock.quantity }} on <strong>{{recent_stock.date_out}}</strong>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">No recent outgoing Stock.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="custom-block bg-white">
+                <h5 class="mb-4">Activity Overview</h5>
+                <div id="pie-chart"></div>
+            </div>
+
+        </div>
+
+        <div class="col-lg-5 col-12">
+            <div class="custom-block custom-block-profile-front custom-block-profile text-center bg-white">
+                <div class="custom-block-profile-image-wrap mb-4">
+                    <svg
+                            class="custom-block-profile-image img-fluid"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 100 100"
+                            width="100" height="100"
+                            alt="Profile Icon"
+                    >
+                        <circle cx="50" cy="50" r="48" fill="#e0e0e0" stroke="#b0b0b0" stroke-width="2"/>
+                        <circle cx="50" cy="35" r="18" fill="#f3d1bf" />
+                        <path d="M32 32c6-8 24-8 30 0-6-10-24-10-30 0z" fill="#604d40" />
+                        <path d="M50 60c-15 0-30 10-30 30v10h60v-10c0-20-15-30-30-30z" fill="#4a90e2"/>
+                        <circle cx="42" cy="35" r="3" fill="#000" />
+                        <circle cx="58" cy="35" r="3" fill="#000" />
+                        <path d="M42 45 Q50 52, 58 45" stroke="#000" stroke-width="2" fill="none" />
+                    </svg>
+                    <a href="{% url 'profile' %}" class="bi-pencil-square custom-block-edit-icon"></a>
+                </div>
+                <p class="d-flex flex-wrap mb-2">
+                    <strong>Name:</strong>
+                    <span>{{ request.user.get_full_name }}</span>
+                </p>
+                <p class="d-flex flex-wrap mb-2">
+                    <strong>Email:</strong>
+                    <a href="mailto:{{ request.user.email }}">{{ request.user.email }}</a>
+                </p>
+                <p class="d-flex flex-wrap mb-0">
+                    <strong>Phone:</strong>
+                    <a href="tel:{{ request.user.profile.phone_number }}">{{ request.user.profile.phone_number }}</a>
+                </p>
+            </div>
+
+        </div>
+        <div id="chart"></div>
+
+        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+        <script type="text/javascript">
+            // Data passed from Django view
+            var stockLabels = {{ stock_labels|safe }};
+            var stockQuantities = {{ stock_quantities|safe }};
+            var outstockSeries = {{ outstock_series|safe }};
+
+            var options = {
+                series: [{
+                    name: 'Stock Quantity',
+                    data: stockQuantities
+                }, {
+                    name: 'Out-Stock Quantity',
+                    data: outstockSeries
+                }],
+                chart: {
+                    type: 'bar',
+                    height: 550
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        columnWidth: '55%',
+                        endingShape: 'rounded'
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    show: true,
+                    width: 2,
+                    colors: ['transparent']
+                },
+                xaxis: {
+                    categories: stockLabels
+                },
+                yaxis: {
+                    title: {
+                        text: 'Quantity'
+                    }
+                },
+                fill: {
+                    opacity: 1
+                },
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'left',
+                    offsetX: 40
+                }
+            };
+
+            var chart = new ApexCharts(document.querySelector("#chart"), options);
+            chart.render();
+        </script>
+    </div>
+</main>
+{% endblock %}

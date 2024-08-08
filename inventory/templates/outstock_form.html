@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %} Out-Stock Form {% endblock title %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2 class="text-center" style="color: #ea2088; font-weight: bold;">Out-Stock Form</h2>
+            <br><br>
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="id_stock">Select Stock:</label>
+                    <select name="stock" class="form-control{% if form.stock.errors %} is-invalid{% endif %}" id="id_stock">
+                        {% for choice in form.stock.field.queryset %}
+                        <option value="{{ choice.id }}" {% if form.stock.value == choice.id %}selected{% endif %}>{{ choice }}</option>
+                        {% endfor %}
+                    </select>
+                    {% for error in form.stock.errors %}
+                    <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_quantity">Quantity:</label>
+                    <input type="number" name="quantity" class="form-control{% if form.quantity.errors %} is-invalid{% endif %}" id="id_quantity" value="{{ form.quantity.value|default_if_none:'' }}">
+                    {% for error in form.quantity.errors %}
+                    <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_remarks">Remarks:</label>
+                    <input type="text" name="remarks" class="form-control{% if form.remarks.errors %} is-invalid{% endif %}" id="id_remarks" value="{{ form.remarks.value|default_if_none:'' }}">
+                    {% for error in form.remarks.errors %}
+                    <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">Submit</button>
+                <a href="{% url 'inventory' %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
