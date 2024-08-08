@@ -20,9 +20,15 @@ class HomeView(View):
         recent_out_stocks = OutStock.objects.order_by('-id')[:10]
         total_stock = Stock.objects.aggregate(total_quantity=Sum('quantity'))['total_quantity']
         total_outstock = OutStock.objects.aggregate(total_quantity=Sum('quantity'))['total_quantity']
+        if not total_stock:
+            total_stock = 0
+        if not total_outstock:
+            total_outstock = 0
 
         stock_data = Stock.objects.all()
         outstock_data = OutStock.objects.values('stock').annotate(total_outstock=Sum('quantity'))
+        if not outstock_data:
+            outstock_data = 0
         stock_labels = []
         stock_quantities = []
         outstock_series = []
